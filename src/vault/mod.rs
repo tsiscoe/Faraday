@@ -1,13 +1,13 @@
 //! Two-Tier `XChaCha20-Poly1305` SQLite WAL Secret Vault & Redaction Audit Store (`faraday.db`).
 //!
-//! Pre-Hardened Invariants (`WP-FARADAY-2`):
+//! Pre-Hardened Invariants:
 //! - **Two-Tier Per-Secret DEKs + Contextual AAD:** Every secret row stores `wrapped_dek` and
 //!   `ciphertext` bound to `faraday-v1|<scope>|<key_name>|dek` and `|val`. Swapping ciphertexts
 //!   across scopes or variable names fails authentication immediately.
-//! - **Atomic `BEGIN IMMEDIATE` Transactions (`[CODEX-P1-02]`):** All mutations (`set_secret`,
+//! - **Atomic `BEGIN IMMEDIATE` Transactions (`CWE-362`):** All mutations (`set_secret`,
 //!   `import_secrets_atomic`, `delete_secret`, `record_redaction_event`) execute inside
 //!   `TransactionBehavior::Immediate` with `PRAGMA secure_delete = ON` and `busy_timeout(5000ms)`.
-//! - **Verified Fail-Closed Vault & Sidecar ACLs (`[CODEX-P0-03]`):** `enforce_vault_and_sidecar_acls`
+//! - **Verified Fail-Closed Vault & Sidecar ACLs (`CWE-732`):** `enforce_vault_and_sidecar_acls`
 //!   verifies `icacls /inheritance:r` exit status `0` on Windows (`0700`/`0600` on Unix) across
 //!   the parent directory, `faraday.db`, `faraday.db-wal`, and `faraday.db-shm` after WAL init.
 
@@ -509,7 +509,7 @@ pub fn enforce_vault_and_sidecar_acls(db_path: &Path) -> Result<()> {
 }
 
 /// Enforce strict owner-only filesystem ACLs (`icacls /inheritance:r` on Windows, `0700`/`0600` on Unix)
-/// and fail closed if permission application fails (`[CODEX-P0-03]`).
+/// and fail closed if permission application fails (`CWE-732`).
 pub fn enforce_owner_only_acl(path: &Path, is_dir: bool) -> Result<()> {
     #[cfg(unix)]
     {

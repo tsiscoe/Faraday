@@ -1,4 +1,4 @@
-//! Zero-Disk Process Secret Injector & Live 4-Encoding Stdout/Stderr Leak Redaction Cage (`WP-FARADAY-3`).
+//! Zero-Disk Process Secret Injector & Live 4-Encoding Stdout/Stderr Leak Redaction Cage.
 //!
 //! Security Architecture:
 //! - **4-Encoding SIMD `Aho-Corasick` (`LeftmostLongest`) Redactor (`FaradayRedactor`):**
@@ -10,11 +10,11 @@
 //!
 //!   Replaces any match in child `stdout` or `stderr` with `[FARADAY:REDACTED:<KEY_NAME>:<BLAKE3_TAG>]`.
 //! - **Cancel-Safe Bounded Line Reader (`CancelSafeLineReader<R>`):**
-//!   Preserves partial line chunks across cancelled `tokio::select!` polls (`[CODEX-P1-01]`) and
+//!   Preserves partial line chunks across cancelled `tokio::select!` polls and
 //!   enforces `MAX_STREAM_LINE_BYTES = 4 MiB` (`CWE-770`).
 //! - **Child Environment Scrubbing & Ephemeral Injection:**
 //!   Strips `FARADAY_PASSPHRASE`, `FARADAY_DB_PATH`, `LOOM_*`, and `SIGNET_*` from the child's
-//!   environment (`[HORDE-01]`), supports `--isolate-env` (`cmd.env_clear()` + `SAFE_OS_ENV_ALLOWLIST`),
+//!   environment (`CWE-526`), supports `--isolate-env` (`cmd.env_clear()` + `SAFE_OS_ENV_ALLOWLIST`),
 //!   injects decrypted scoped secrets, and immediately zeroizes the parent's plaintext copies after `spawn()`.
 
 use std::fmt::Write as _;
@@ -43,7 +43,7 @@ pub const MAX_STREAM_LINE_BYTES: usize = 4 * 1024 * 1024;
 pub const MAX_STDIO_WRITE_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Control environment variables unconditionally stripped from child processes so a child cannot
-/// unlock `faraday.db` (`[HORDE-01]`).
+/// unlock `faraday.db` (`CWE-526`).
 pub const SCRUBBED_CONTROL_ENV_KEYS: &[&str] = &[
     "FARADAY_PASSPHRASE",
     "FARADAY_DB_PATH",
@@ -54,7 +54,7 @@ pub const SCRUBBED_CONTROL_ENV_KEYS: &[&str] = &[
     "SIGNET_DB_PATH",
 ];
 
-/// Safe baseline OS environment variables preserved when `--isolate-env` is active (`[CODEX-P1-04]`).
+/// Safe baseline OS environment variables preserved when `--isolate-env` is active (`CWE-526`).
 pub const SAFE_OS_ENV_ALLOWLIST: &[&str] = &[
     "PATH",
     "PATHEXT",
@@ -285,7 +285,7 @@ pub enum BoundedLineResult {
     Eof,
 }
 
-/// Cancel-safe buffered line reader (`[CODEX-P1-01]`).
+/// Cancel-safe buffered line reader.
 /// Retains `buf` inside the struct so cancellation inside `tokio::select!` never loses partial lines.
 pub struct CancelSafeLineReader<R> {
     reader: R,
@@ -367,7 +367,7 @@ where
 }
 
 /// Compute control environment keys (`FARADAY_*`, `LOOM_*`, `SIGNET_*`) that must be stripped
-/// before spawning a child process (`[HORDE-01]`).
+/// before spawning a child process (`CWE-526`).
 pub fn compute_scrubbed_control_env_keys<I, K>(env_keys: I) -> Vec<String>
 where
     I: IntoIterator<Item = K>,
@@ -451,7 +451,7 @@ where
 
 /// Spawn `command_args` with `scope` secrets injected into memory, redact all `stdout` and `stderr`
 /// lines through [`FaradayRedactor`], record redaction events in `vault`, and return the child's
-/// exit status code (`WP-FARADAY-3`).
+/// exit status code.
 pub async fn run_caged_process(
     vault: &FaradayVault,
     scope: &str,

@@ -1,4 +1,4 @@
-//! `.env` File Harvester, Parser & Zero-Fill Cryptographic Shredder (`WP-FARADAY-4`).
+//! `.env` File Harvester, Parser & Zero-Fill Cryptographic Shredder.
 //!
 //! Security Invariants:
 //! - Enforces `MAX_DOTENV_BYTES = 16 MiB` (`CWE-400`).
