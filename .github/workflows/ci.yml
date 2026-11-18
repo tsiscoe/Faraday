@@ -13,8 +13,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check-and-test:
-    name: Verify (${{ matrix.os }})
+  lint:
+    name: Lint (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -39,14 +39,44 @@ jobs:
       - name: Lint with Clippy
         run: cargo clippy --all-targets -- -D warnings
 
+  test:
+    name: Test (${{ matrix.os }})
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo registry and build artifacts
+        uses: Swatinem/rust-cache@v2
+
       - name: Build release binary
         run: cargo build --release --verbose
 
       - name: Run unit, integration, and proptest suites
         run: cargo test --verbose
 
-      - name: Supply-chain vulnerability audit (RustSec)
-        if: matrix.os == 'ubuntu-latest'
+  supply-chain:
+    name: Supply-chain audit (RustSec)
+    needs: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run cargo-audit
         run: |
           cargo install cargo-audit --locked
           cargo audit
