@@ -1,0 +1,13 @@
+# Faraday (`faraday-cage`) — LLM Context Specification
+
+> Pure-Rust (`#![forbid(unsafe_code)]`, 2024 Edition) Zero-Disk Process Secret Injector & Live 4-Encoding Stdout/Stderr Leak Redaction Cage (`Argon2id` + Two-Tier `XChaCha20-Poly1305` + SIMD `Aho-Corasick`).
+
+## Core CLI Subcommands
+- `faraday init`: Initializes the Two-Tier `XChaCha20-Poly1305` SQLite WAL vault (`faraday.db`) and locks owner-only ACLs.
+- `faraday set --scope <scope> --key <key> [--value <val>]`: Encrypts and stores a secret under a fresh 256-bit DEK.
+- `faraday get --scope <scope> --key <key> [--reveal]`: Prints the `BLAKE3` short tag (or reveals plaintext only when `--reveal` is passed).
+- `faraday list [--scope <scope>] [--json]`: Lists secret metadata without exposing plaintext values.
+- `faraday import --scope <scope> --file .env [--shred]`: Imports `.env` variables atomically and optionally zero-fill shreds the `.env` file.
+- `faraday run --scope <scope> [--isolate-env] -- <cmd...>`: Spawns a child command with scoped secrets in RAM and redacts Raw, Base64, URL-encoded, and Hex secret leaks from `stdout` and `stderr`.
+- `faraday audit [--json]`: Displays intercepted stdout/stderr secret leak events.
+- `faraday tui`: Ratatui v0.30+ 3-pane Faraday Cage Monitor.
