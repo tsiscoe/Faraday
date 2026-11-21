@@ -5,7 +5,7 @@
 [![Rust: 2024 Edition](https://img.shields.io/badge/Rust-2024_Edition-orange.svg)](Cargo.toml)
 [![Safety: #![forbid(unsafe_code)]](https://img.shields.io/badge/unsafe-forbid-success.svg)](src/lib.rs)
 
-**Faraday** (`faraday-cage`) is a pure-Rust (`#![forbid(unsafe_code)]`) **Zero-Disk Process Secret Injector & Live 4-Encoding Stdout/Stderr Leak Redaction Cage** for AI-assisted software engineering, local dev servers, and CI/CD pipelines.
+**Faraday** (`faraday-cage`) is a pure-Rust (`#![forbid(unsafe_code)]`) process secret vault and live output redactor: it keeps your `.env` off the disk and out of the AI's reach, injects secrets directly into child process RAM, and guillotines secret leaks mid-pipe across raw, Base64, URL, and Hex encodings.
 
 ---
 
