@@ -2,6 +2,20 @@
 
 Every notable change to **Faraday** (`faraday-cage`) goes here. Unlike your production logs, this file is supposed to contain the history of what happened.
 
+## [0.2.0] - 2026-11-21
+
+Hardened dependency baseline, clean CI supply-chain verification, and Dependabot automation alignment.
+
+### Changed
+- **Dependency modernizations:**
+  - Upgraded `rusqlite` to `0.43.0` with bundled SQLite WAL isolation and secure deletion.
+  - Upgraded `zeroize` to `1.9.2` with zero-fill memory protection on drop.
+  - Upgraded `clap` to `4.6.8` with updated command-line interface parsing.
+  - Upgraded `uuid` to `1.29.3` for unique secret tag generation.
+- **CI / Supply-Chain:**
+  - Pinned Dependabot rule to ignore upstream breaking changes for `sha2 >= 0.11.0` preserving `hkdf 0.12` compatibility.
+  - Aligned cross-platform CI matrix workflows on GitHub Actions across Windows, Linux, and macOS.
+
 ## [0.1.0] - 2026-11-17
 
 The first release. The `.env` file has been served its eviction notice.

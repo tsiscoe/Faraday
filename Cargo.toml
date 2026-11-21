@@ -1,6 +1,6 @@
 [package]
 name = "faraday-cage"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["tsiscoe <tsiscoe@users.noreply.github.com>"]
 description = "Faraday: Zero-Disk Process Secret Injector & Live 4-Encoding Stdout/Stderr Leak Redaction Cage (Argon2id + Two-Tier XChaCha20-Poly1305 + SIMD Aho-Corasick)"
